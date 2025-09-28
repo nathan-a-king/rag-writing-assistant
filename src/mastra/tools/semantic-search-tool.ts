@@ -2,13 +2,18 @@ import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { VoyageAIClient } from 'voyageai';
 import { createClient } from '@libsql/client';
+import { resolve } from 'path';
 
 const voyageClient = new VoyageAIClient({
   apiKey: process.env.VOYAGE_API_KEY,
 });
 
+const projectRoot = process.cwd().includes('.mastra/output')
+  ? resolve(process.cwd(), '../..')
+  : process.cwd();
+
 const dbClient = createClient({
-  url: 'file:./vectors.db',
+  url: `file:${resolve(projectRoot, 'vectors.db')}`,
 });
 
 function cosineSimilarity(a: number[], b: number[]): number {

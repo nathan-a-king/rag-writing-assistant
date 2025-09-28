@@ -1,9 +1,14 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { createClient } from '@libsql/client';
+import { resolve } from 'path';
+
+const projectRoot = process.cwd().includes('.mastra/output')
+  ? resolve(process.cwd(), '../..')
+  : process.cwd();
 
 const client = createClient({
-  url: 'file:./vectors.db',
+  url: `file:${resolve(projectRoot, 'vectors.db')}`,
 });
 
 async function initializeVectorTable() {

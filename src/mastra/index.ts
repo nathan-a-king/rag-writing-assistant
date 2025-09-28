@@ -5,6 +5,11 @@ import { LibSQLStore } from '@mastra/libsql';
 import { documentIngestionWorkflow } from './workflows/document-ingestion-workflow';
 import { queryWorkflow } from './workflows/query-workflow';
 import { writingAssistantAgent } from './agents/writing-assistant-agent';
+import { resolve } from 'path';
+
+const projectRoot = process.cwd().includes('.mastra/output')
+  ? resolve(process.cwd(), '../..')
+  : process.cwd();
 
 export const mastra = new Mastra({
   workflows: {
@@ -15,7 +20,7 @@ export const mastra = new Mastra({
     writingAssistantAgent
   },
   storage: new LibSQLStore({
-    url: ":memory:",
+    url: `file:${resolve(projectRoot, 'mastra.db')}`,
   }),
   logger: new PinoLogger({
     name: 'Mastra',

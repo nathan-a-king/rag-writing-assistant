@@ -3,6 +3,11 @@ import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
 import { semanticSearchTool } from '../tools/semantic-search-tool';
+import { resolve } from 'path';
+
+const projectRoot = process.cwd().includes('.mastra/output')
+  ? resolve(process.cwd(), '../..')
+  : process.cwd();
 
 export const writingAssistantAgent = new Agent({
   name: 'Writing Assistant Agent',
@@ -33,7 +38,7 @@ export const writingAssistantAgent = new Agent({
   tools: { semanticSearchTool },
   memory: new Memory({
     storage: new LibSQLStore({
-      url: 'file:../mastra.db',
+      url: `file:${resolve(projectRoot, 'agent-memory.db')}`,
     }),
   }),
 });
