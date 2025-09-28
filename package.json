@@ -22,6 +22,7 @@
     "@mastra/libsql": "^0.14.3",
     "@mastra/loggers": "^0.10.13",
     "@mastra/memory": "^0.15.3",
+    "voyageai": "^0.0.8",
     "zod": "^3.25.76"
   },
   "devDependencies": {
