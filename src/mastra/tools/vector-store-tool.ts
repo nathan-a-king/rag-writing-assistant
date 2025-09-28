@@ -117,8 +117,27 @@ export const vectorSearchTool = createTool({
     const rows = await client.execute('SELECT * FROM document_embeddings');
 
     const results = rows.rows.map((row) => {
-      const embeddingBuffer = row.embedding as Buffer;
-      const embedding = Array.from(new Float32Array(embeddingBuffer.buffer));
+      let embedding: number[];
+
+      const embeddingData = row.embedding;
+
+      if (embeddingData instanceof ArrayBuffer) {
+        embedding = Array.from(new Float32Array(embeddingData));
+      } else if (embeddingData instanceof Uint8Array) {
+        embedding = Array.from(new Float32Array(embeddingData.buffer, embeddingData.byteOffset, embeddingData.byteLength / 4));
+      } else if (Buffer.isBuffer(embeddingData)) {
+        embedding = Array.from(new Float32Array(embeddingData.buffer, embeddingData.byteOffset, embeddingData.byteLength / 4));
+      } else if (typeof embeddingData === 'object' && embeddingData !== null) {
+        if (embeddingData.type === 'Buffer' && Array.isArray(embeddingData.data)) {
+          const buffer = Buffer.from(embeddingData.data);
+          embedding = Array.from(new Float32Array(buffer.buffer, buffer.byteOffset, buffer.byteLength / 4));
+        } else {
+          const buffer = Buffer.from(Object.values(embeddingData));
+          embedding = Array.from(new Float32Array(buffer.buffer, buffer.byteOffset, buffer.byteLength / 4));
+        }
+      } else {
+        throw new Error(`Unexpected embedding type: ${typeof embeddingData}, constructor: ${embeddingData?.constructor?.name}`);
+      }
 
       const similarity = cosineSimilarity(queryEmbedding, embedding);
 
